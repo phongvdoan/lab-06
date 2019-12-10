@@ -1,5 +1,5 @@
 'use strict';
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 const express = require('express');
 const cors = require('cors');
 
@@ -19,10 +19,10 @@ function Forcast(forecast, time) {
   this.time = getDate(new Date(time));
 }
 
-function serverError(err) {
-  // this.status = status,
-  res.send('Sorry, something went wrong')
-}
+// function serverError(err) {
+//   // this.status = status,
+//   res.send('Sorry, something went wrong')
+// }
 
 app.get('/location', (request, response) => {
   const geoData = require('./data/geo.json');
