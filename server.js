@@ -16,13 +16,14 @@ function Geolocation(latitude, longitude, formatted_address, search_query) {
 
 function Forcast(forecast, time) {
   this.forecast = forecast,
-  this.time = getDate(new Date(time));
+  this.time = getDate(new Date(time * 1000));
 }
 
-// function serverError(err) {
-//   // this.status = status,
-//   res.send('Sorry, something went wrong')
-// }
+let error = {
+  // this.status = status,
+  status: '500',
+  responseText: 'Sorry, something went wrong'
+}
 
 app.get('/location', (request, response) => {
   const geoData = require('./data/geo.json');
@@ -30,20 +31,30 @@ app.get('/location', (request, response) => {
   const geoDataGeometry = geoDataResult.geometry;
   const geoDataLocation = geoDataGeometry.location;
   const newData = new Geolocation(geoDataLocation.lat, geoDataLocation.lng, geoDataResult.formatted_address, geoDataResult.address_components[0].short_name.toLowerCase());
-  response.send(newData);
+  console.log('newData.search_query :', newData.search_query);
+  if (request.query.data === newData.search_query) {
+    response.send(newData);
+  } else {
+    response.send(error.responseText);
+  }
 })
 
 app.get('/weather', (request, response) => {
   const weatherData = require('./data/darksky.json');
   const dailyWeatherData = weatherData.daily;
   const dailyData = dailyWeatherData.data;
-  // const forcastOne = new Forcast(dailyData.summary, dailyData.time);
   const weatherArr = [];
   dailyData.forEach(val => {
     weatherArr.push(new Forcast(val.summary, val.time));
   })
-  console.log('weatherArr :', weatherArr);
+
   response.send(weatherArr);
+
+  // if (request.query.data === newData.search_query) {
+  //   response.send(weatherArr);
+  // } else {
+  //   response.send(error.responseText);
+  // }
 })
 
 function getDate(time) {
