@@ -7,6 +7,7 @@ const app = express();
 require('dotenv').config();
 app.use(cors());
 
+
 function Geolocation(latitude, longitude, formatted_address, search_query) {
   this.latitude = latitude,
   this.longitude = longitude,
@@ -31,12 +32,10 @@ app.get('/location', (request, response) => {
   const geoDataGeometry = geoDataResult.geometry;
   const geoDataLocation = geoDataGeometry.location;
   newData.push(new Geolocation(geoDataLocation.lat, geoDataLocation.lng, geoDataResult.formatted_address, geoDataResult.address_components[0].short_name.toLowerCase()));
-  console.log('newData.search_query :', newData[0].search_query);
-  console.log('request.query.data :', request.query.data);
   if (request.query.data === newData[0].search_query) {
     response.send(newData[0]);
-  } else {
-    response.send(error.responseText);
+  } else if (request.query.data !== newData[0].search_query) {
+    throw new Error('Sorry, something went wrong');
   }
 })
 
@@ -48,11 +47,10 @@ app.get('/weather', (request, response) => {
   dailyData.forEach(val => {
     weatherArr.push(new Forcast(val.summary, val.time));
   })
-
-  if (request.query.data === newData.search_query) {
+  if (request.query.data.search_query === newData[0].search_query) {
     response.send(weatherArr);
   } else {
-    response.send(error.responseText);
+    throw new Error('Sorry, something went wrong');
   }
 })
 
