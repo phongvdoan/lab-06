@@ -24,16 +24,17 @@ let error = {
   status: '500',
   responseText: 'Sorry, something went wrong'
 }
-
+const newData = [];
 app.get('/location', (request, response) => {
   const geoData = require('./data/geo.json');
   const geoDataResult = geoData.results[0];
   const geoDataGeometry = geoDataResult.geometry;
   const geoDataLocation = geoDataGeometry.location;
-  const newData = new Geolocation(geoDataLocation.lat, geoDataLocation.lng, geoDataResult.formatted_address, geoDataResult.address_components[0].short_name.toLowerCase());
-  console.log('newData.search_query :', newData.search_query);
-  if (request.query.data === newData.search_query) {
-    response.send(newData);
+  newData.push(new Geolocation(geoDataLocation.lat, geoDataLocation.lng, geoDataResult.formatted_address, geoDataResult.address_components[0].short_name.toLowerCase()));
+  console.log('newData.search_query :', newData[0].search_query);
+  console.log('request.query.data :', request.query.data);
+  if (request.query.data === newData[0].search_query) {
+    response.send(newData[0]);
   } else {
     response.send(error.responseText);
   }
@@ -48,13 +49,11 @@ app.get('/weather', (request, response) => {
     weatherArr.push(new Forcast(val.summary, val.time));
   })
 
-  response.send(weatherArr);
-
-  // if (request.query.data === newData.search_query) {
-  //   response.send(weatherArr);
-  // } else {
-  //   response.send(error.responseText);
-  // }
+  if (request.query.data === newData.search_query) {
+    response.send(weatherArr);
+  } else {
+    response.send(error.responseText);
+  }
 })
 
 function getDate(time) {
